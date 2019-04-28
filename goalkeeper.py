@@ -1,5 +1,11 @@
 import numpy as np
+import argparse
 from sklearn.linear_model import LinearRegression
+
+ap = argparse.ArgumentParser(description='Хоккейный вратарь. Отбивает шайбы по льду.')
+ap.add_argument("-c", "--coordinat", type = int, required = False, help="Вывод изображения на координатной оси.")
+ap.add_argument("-p", "--predict", type = int, required = False, help="Предсказание для введенного числа X.")
+args = vars(ap.parse_args())
 
 # Линейная регрессия
 def predict():
