@@ -1,5 +1,8 @@
 import numpy as np
+import cv2
 import argparse
+import matplotlib.pyplot as plt
+
 from sklearn.linear_model import LinearRegression
 
 ap = argparse.ArgumentParser(description='Хоккейный вратарь. Отбивает шайбы по льду.')
@@ -45,4 +48,11 @@ def predict():
     print('predicted response:', int(y_pred), sep='\n')
 
 if __name__ == '__main__':
-    predict()
+    #predict()
+    if args["coordinat"] is not None:
+        cap = cv2.VideoCapture(args["coordinat"])
+
+        _, frame = cap.read()
+
+        plt.imshow(frame)
+        plt.show()
