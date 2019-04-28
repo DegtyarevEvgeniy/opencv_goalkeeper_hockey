@@ -11,11 +11,11 @@ ap.add_argument("-p", "--predict", type = int, required = False, help="Пред�
 args = vars(ap.parse_args())
 
 # Линейная регрессия
-def predict():
+def predict(X):
     # прямая линия от (0,0) до (10,10)
     # преобразование x в двумерный массив, т.е. 1 колонка и необходимое количество рядов
-    x = np.array([0, 1, 2, 4, 5, 6, 8, 10]).reshape((-1, 1))
-    y = np.array([0, 1, 2, 4, 5, 6, 8, 10])
+    x = np.array([1, 2, 4, 5, 6, 8, 10]).reshape((-1, 1))
+    y = np.array([1, 2, 4, 5, 6, 8, 10])
 
     print(x)
     print(y)
@@ -42,13 +42,14 @@ def predict():
     # y_pred = model.intercept_ + model.coef_ * x
 
     # предсказание для x = 23
-    x0 = np.array([23]).reshape((-1, 1))
+    #x0 = np.array([23]).reshape((-1, 1))
+    x0 = np.array([X]).reshape((-1, 1))
     y_pred = model.predict(x0)
-    print('if x = ', int(x0))
-    print('predicted response:', int(y_pred), sep='\n')
+    print('При X =', int(x0))
+    print('Предсказание для Y =', int(y_pred))
 
 if __name__ == '__main__':
-    #predict()
+
     if args["coordinat"] is not None:
         cap = cv2.VideoCapture(args["coordinat"])
 
@@ -56,3 +57,6 @@ if __name__ == '__main__':
 
         plt.imshow(frame)
         plt.show()
+
+    if args["predict"] is not None:
+        predict(args["predict"])
