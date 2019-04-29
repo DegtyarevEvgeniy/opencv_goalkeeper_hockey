@@ -2,13 +2,13 @@ import numpy as np
 import cv2
 import argparse
 import matplotlib.pyplot as plt
-
 from sklearn.linear_model import LinearRegression
 
 ap = argparse.ArgumentParser(description='Хоккейный вратарь. Отбивает шайбы по льду. При условии. что шайба движется по прямой.')
 ap.add_argument("-c", "--coordinat", type = int, required = False, help="Вывод изображения на координатной оси.")
 ap.add_argument("-p", "--predict", type = int, required = False, help="Предсказание для введенного числа X.")
 ap.add_argument("-r", "--range", type = int, required = False, help="Определение параметров RGB.")
+ap.add_argument("-b", "--ball", type = int, required = False, help="Поиск мяча.")
 args = vars(ap.parse_args())
 
 # Калибровка по цвету
@@ -90,6 +90,13 @@ def predict(X):
     print('При X =', int(x0))
     print('Предсказание для Y =', int(y_pred))
 
+# Поиск мяча
+def ball():
+    print('Test')
+
+
+
+
 if __name__ == '__main__':
 
     if args["coordinat"] is not None:
@@ -105,3 +112,18 @@ if __name__ == '__main__':
 
     if args["range"] is not None:
         range(args["range"])
+
+    if args["ball"] is not None:
+        cap = cv2.VideoCapture(args["ball"])
+
+        while(cap.isOpened()):
+            _, frame = cap.read()
+
+            cv2.imshow('Original', frame)
+            ball()
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+        cap.release()
+        cv2.destroyAllWindows()
