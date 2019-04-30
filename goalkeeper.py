@@ -43,7 +43,7 @@ def range(camera):
         maxg = cv2.getTrackbarPos('maxg', 'result')
         maxr = cv2.getTrackbarPos('maxr', 'result')
 
-        mask = cv2.inRange(hsv, (minb,ming,minr), (maxb,maxg, maxr))
+        mask = cv2.inRange(hsv, (minb, ming, minr), (maxb, maxg, maxr))
         cv2.imshow('mask', mask)
         result = cv2.bitwise_and(frame, frame, mask = mask)
         cv2.imshow('result', result)
@@ -114,6 +114,50 @@ def ball(image):
 
     	cv2.imshow("output", np.hstack([image, output]))
 
+# Выделение по цвету
+def color():
+    cv2.namedWindow( "result" )
+
+    # Границы для синего
+    hsv_min = np.array((94, 87, 223), np.uint8)
+    hsv_max = np.array((117, 255, 255), np.uint8)
+
+    # Цвет для текста центра
+    color_yellow = (0,255,255)
+
+    while(cap.isOpened()):
+        _, frame = cap.read()
+        #img = cv2.flip(frame,1) # отражение кадра вдоль оси Y
+        img = np.copy(frame)
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        thresh = cv2.inRange(hsv, hsv_min, hsv_max)
+
+        # Момент изображения — это суммарная характеристика пятна, представляющая собой сумму всех точек (пикселей) этого пятна.
+        moments = cv2.moments(thresh, 1)
+        # Момент первого порядка m10 представляет собой сумму Y координат точек
+        dM01 = moments['m01']
+        # Момент первого порядка m10 представляет собой сумму X координат точек
+        dM10 = moments['m10']
+        # Момент нулевого порядка m00 — это количество всех точек, составляющих пятно
+        dArea = moments['m00']
+
+        # Если количество пикселей пятна > 100
+        if dArea > 100:
+            # Средние координаты X и Y - центр пятна
+            x = int(dM10 / dArea)
+            y = int(dM01 / dArea)
+            cv2.circle(img, (x, y), 5, color_yellow, 2)
+            cv2.putText(img, "%d-%d" % (x,y), (x+10,y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, color_yellow, 2)
+
+        cv2.imshow('result', img)
+        cv2.imshow('thresh ', thresh)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
 if __name__ == '__main__':
 
     if args["coordinat"] is not None:
@@ -131,46 +175,5 @@ if __name__ == '__main__':
         range(args["range"])
 
     if args["ball"] is not None:
-        cv2.namedWindow( "result" )
-
         cap = cv2.VideoCapture(args["ball"])
-
-        # Границы для синего
-        hsv_min = np.array((86, 65, 194), np.uint8)
-        hsv_max = np.array((123, 2420, 255), np.uint8)
-
-        # Цвет для текста центра
-        color_yellow = (0,255,255)
-
-        while(cap.isOpened()):
-            _, frame = cap.read()
-            #img = cv2.flip(frame,1) # отражение кадра вдоль оси Y
-            img = np.copy(frame)
-            hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-            thresh = cv2.inRange(hsv, hsv_min, hsv_max)
-
-            # Момент изображения — это суммарная характеристика пятна, представляющая собой сумму всех точек (пикселей) этого пятна.
-            moments = cv2.moments(thresh, 1)
-            # Момент первого порядка m10 представляет собой сумму Y координат точек
-            dM01 = moments['m01']
-            # Момент первого порядка m10 представляет собой сумму X координат точек
-            dM10 = moments['m10']
-            # Момент нулевого порядка m00 — это количество всех точек, составляющих пятно
-            dArea = moments['m00']
-
-            # Если количество пикселей пятна > 100
-            if dArea > 100:
-                ball(img)
-                # Средние координаты X и Y - центр пятна
-                x = int(dM10 / dArea)
-                y = int(dM01 / dArea)
-                cv2.circle(img, (x, y), 5, color_yellow, 2)
-                cv2.putText(img, "%d-%d" % (x,y), (x+10,y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, color_yellow, 2)
-
-            cv2.imshow('result', img)
-
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-        cap.release()
-        cv2.destroyAllWindows()
+        color()
