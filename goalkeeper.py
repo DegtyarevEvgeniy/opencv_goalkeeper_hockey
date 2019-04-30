@@ -107,12 +107,25 @@ def ball(image):
     	# преобразование координаты (x, y) и радиуса окружностей в целые числа
     	circles = np.round(circles[0, :]).astype("int")
 
-    	# Обвести найденый круг окружностью и нарисовать квдрат в центре круга
+    	# Обвести найденый круг окружностью и нарисовать квадрат в центре круга
     	for (x, y, r) in circles:
     		cv2.circle(output, (x, y), r, (0, 255, 0), 4)
     		cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
 
     	cv2.imshow("output", np.hstack([image, output]))
+
+# массивы для линейной регрессии
+def array(x, y):
+    # наполняем координатами центра
+    data_x.append(x)
+    data_y.append(y)
+    print('X', data_x)
+    print('Y', data_y)
+
+    # количество записей/замеров
+    # если np.array(data_x).shape = 20 то выполнить предсказание
+
+    #print(np.array(data_x).shape)
 
 # Выделение по цвету
 def color():
@@ -129,6 +142,7 @@ def color():
         _, frame = cap.read()
         #img = cv2.flip(frame,1) # отражение кадра вдоль оси Y
         img = np.copy(frame)
+        ball(img)
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         thresh = cv2.inRange(hsv, hsv_min, hsv_max)
 
@@ -149,6 +163,9 @@ def color():
             cv2.circle(img, (x, y), 5, color_yellow, 2)
             cv2.putText(img, "%d-%d" % (x,y), (x+10,y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, color_yellow, 2)
 
+            # наполняем массивы значениеями координат центра окружности
+            array(x, y)
+
         cv2.imshow('result', img)
         cv2.imshow('thresh ', thresh)
 
@@ -157,6 +174,8 @@ def color():
 
     cap.release()
     cv2.destroyAllWindows()
+
+    return (np.array(data_x))
 
 if __name__ == '__main__':
 
@@ -176,4 +195,10 @@ if __name__ == '__main__':
 
     if args["ball"] is not None:
         cap = cv2.VideoCapture(args["ball"])
+
+        # массив для записи координат центра
+        # для линейной регрессии
+        data_x = []
+        data_y = []
+
         color()
