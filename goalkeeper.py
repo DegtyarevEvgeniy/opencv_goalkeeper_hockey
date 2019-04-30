@@ -4,7 +4,7 @@ import argparse
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from collections import deque
-import imutils
+#import imutils
 
 ap = argparse.ArgumentParser(description='Хоккейный вратарь. Отбивает шайбы по льду. При условии. что шайба движется по прямой.')
 ap.add_argument("-c", "--coordinat", type = int, required = False, help="Вывод изображения на координатной оси.")
@@ -58,8 +58,11 @@ def range(camera):
 def predict(X):
     # прямая линия от (0,0) до (10,10)
     # преобразование x в двумерный массив, т.е. 1 колонка и необходимое количество рядов
-    x = np.array([1, 2, 4, 5, 6, 8, 10]).reshape((-1, 1))
+    x = np.array([1, 2, 4, 5, 6, 8, 10])
     y = np.array([1, 2, 4, 5, 6, 8, 10])
+    # добавление еще по одному элементу
+    x=np.append(x,15).reshape((-1, 1))
+    y=np.append(y,15)
 
     print(x)
     print(y)
@@ -93,11 +96,23 @@ def predict(X):
     print('Предсказание для Y =', int(y_pred))
 
 # Поиск мяча
-def ball():
-    print('Test')
+def ball(image):
+    output = image.copy()
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # посик круга
+    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1.2, 100)
 
+    # если найдены круги
+    if circles is not None:
+    	# преобразование координаты (x, y) и радиуса окружностей в целые числа
+    	circles = np.round(circles[0, :]).astype("int")
 
+    	# Обвести найденый круг окружностью и нарисовать квдрат в центре круга
+    	for (x, y, r) in circles:
+    		cv2.circle(output, (x, y), r, (0, 255, 0), 4)
+    		cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
 
+    	cv2.imshow("output", np.hstack([image, output]))
 
 if __name__ == '__main__':
 
@@ -131,7 +146,7 @@ if __name__ == '__main__':
             _, frame = cap.read()
             #img = cv2.flip(frame,1) # отражение кадра вдоль оси Y
             img = np.copy(frame)
-            hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV )
+            hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
             thresh = cv2.inRange(hsv, hsv_min, hsv_max)
 
             # Момент изображения — это суммарная характеристика пятна, представляющая собой сумму всех точек (пикселей) этого пятна.
@@ -145,6 +160,7 @@ if __name__ == '__main__':
 
             # Если количество пикселей пятна > 100
             if dArea > 100:
+                ball(img)
                 # Средние координаты X и Y - центр пятна
                 x = int(dM10 / dArea)
                 y = int(dM01 / dArea)
