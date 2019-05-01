@@ -4,6 +4,7 @@ import argparse
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from config import color_range
+import data_predict
 
 ap = argparse.ArgumentParser(description='Хоккейный вратарь. Отбивает шайбы по льду. При условии. что шайба движется по прямой.')
 ap.add_argument("-c", "--coordinat", type = int, required = False, help="Вывод изображения на координатной оси.")
@@ -127,12 +128,17 @@ def array(x, y):
     # наполняем координатами центра
     data_x.append(x)
     data_y.append(y)
-    print('X', data_x)
-    print('Y', data_y)
+    #print('X', data_x)
+    #print('Y', data_y)
 
     # количество записей/замеров
     # если np.array(data_x).shape = 20 то выполнить предсказание
-
+    print(np.array(data_x).shape[0])
+    if np.array(data_x).shape[0] == 20 or np.array(data_y).shape[0] == 20:
+            handle = open("data_predict.py", "w")
+            handle.write("X = " + str(data_x) + "\n"
+                        "Y = " + str(data_y))
+            handle.close
     #print(np.array(data_x).shape)
 
 # Выделение по цвету
