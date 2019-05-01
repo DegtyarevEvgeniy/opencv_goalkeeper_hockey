@@ -3,8 +3,7 @@ import cv2
 import argparse
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
-from collections import deque
-#import imutils
+from config import range
 
 ap = argparse.ArgumentParser(description='Хоккейный вратарь. Отбивает шайбы по льду. При условии. что шайба движется по прямой.')
 ap.add_argument("-c", "--coordinat", type = int, required = False, help="Вывод изображения на координатной оси.")
@@ -49,6 +48,15 @@ def range(camera):
         cv2.imshow('result', result)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
+            # запись границ оласти цвета в файл
+            handle = open("config/range.py", "w")
+            handle.write("minb = " + str(minb) + "\n"
+                        "ming = " + str(ming) + "\n"
+                        "minr = " + str(minr) + "\n"
+                        "maxb = " + str(maxb) + "\n"
+                        "maxg = " + str(maxg) + "\n"
+                        "maxr = " + str(maxr))
+            handle.close()
             break
 
     cap.release()
