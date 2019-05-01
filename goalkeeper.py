@@ -3,7 +3,7 @@ import cv2
 import argparse
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
-from config import range
+from config import color_range
 
 ap = argparse.ArgumentParser(description='Хоккейный вратарь. Отбивает шайбы по льду. При условии. что шайба движется по прямой.')
 ap.add_argument("-c", "--coordinat", type = int, required = False, help="Вывод изображения на координатной оси.")
@@ -49,13 +49,13 @@ def range(camera):
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             # запись границ оласти цвета в файл
-            handle = open("config/range.py", "w")
-            handle.write("minb = " + str(minb) + "\n"
-                        "ming = " + str(ming) + "\n"
-                        "minr = " + str(minr) + "\n"
-                        "maxb = " + str(maxb) + "\n"
-                        "maxg = " + str(maxg) + "\n"
-                        "maxr = " + str(maxr))
+            handle = open("config/color_range.py", "w")
+            handle.write("MINB = " + str(minb) + "\n"
+                        "MING = " + str(ming) + "\n"
+                        "MINR = " + str(minr) + "\n"
+                        "MAXB = " + str(maxb) + "\n"
+                        "MAXG = " + str(maxg) + "\n"
+                        "MAXR = " + str(maxr))
             handle.close()
             break
 
@@ -139,9 +139,15 @@ def array(x, y):
 def color():
     cv2.namedWindow( "result" )
 
-    # Границы для синего
-    hsv_min = np.array((94, 87, 223), np.uint8)
-    hsv_max = np.array((117, 255, 255), np.uint8)
+    # Границы для выбранного ранее цвета
+    minb = color_range.MINB
+    ming = color_range.MING
+    minr = color_range.MINR
+    maxb = color_range.MAXB
+    maxg = color_range.MAXG
+    maxr = color_range.MAXR
+    hsv_min = np.array((minb, ming, minr), np.uint8)
+    hsv_max = np.array((maxb, maxg, maxr), np.uint8)
 
     # Цвет для текста центра
     color_yellow = (0,255,255)

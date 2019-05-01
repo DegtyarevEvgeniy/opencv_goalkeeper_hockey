@@ -1,0 +1,6 @@
+MINB = 6
+MING = 6
+MINR = 6
+MAXB = 123
+MAXG = 156
+MAXR = 228
