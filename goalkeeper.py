@@ -67,11 +67,19 @@ def range(camera):
 def predict(X):
     # прямая линия от (0,0) до (10,10)
     # преобразование x в двумерный массив, т.е. 1 колонка и необходимое количество рядов
-    x = np.array([1, 2, 4, 5, 6, 8, 10])
-    y = np.array([1, 2, 4, 5, 6, 8, 10])
+    #x = np.array([1, 2, 4, 5, 6, 8, 10])
+    #y = np.array([1, 2, 4, 5, 6, 8, 10])
     # добавление еще по одному элементу
-    x=np.append(x,15).reshape((-1, 1))
-    y=np.append(y,15)
+    #x=np.append(x,15).reshape((-1, 1))
+    #y=np.append(y,15)
+
+    # наполняем массивы данными из файла
+    x = np.array(data_predict.X).reshape((-1, 1))
+    y = np.array(data_predict.Y)
+
+    # построить график
+    plt.plot(x, y)
+    plt.show()
 
     print(x)
     print(y)
