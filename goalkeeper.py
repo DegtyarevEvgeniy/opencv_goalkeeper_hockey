@@ -113,11 +113,12 @@ def predict(X):
     print('Предсказание для Y =', int(y_pred))
 
 # Поиск мяча
-def ball(image):
+def ball(image, img):
     output = image.copy()
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    #gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    gray = cv2.Canny(output, 40, 10)
     # посик круга
-    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1.2, 100)
+    circles = cv2.HoughCircles(output, cv2.HOUGH_GRADIENT, 2.5, 57)
 
     # если найдены круги
     if circles is not None:
@@ -126,10 +127,12 @@ def ball(image):
 
     	# Обвести найденый круг окружностью и нарисовать квадрат в центре круга
     	for (x, y, r) in circles:
-    		cv2.circle(output, (x, y), r, (0, 255, 0), 4)
-    		cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+    		cv2.circle(img, (x, y), r, (0, 0, 255), 4)
+    		#cv2.rectangle(img, (x - 5, y - 5), (x + 5, y + 5), (0, 255, 255), -1)
 
-    	cv2.imshow("output", np.hstack([image, output]))
+    	#cv2.imshow("output", np.hstack([image, output]))
+
+    return(img)
 
 # массивы для линейной регрессии
 def array(x, y):
@@ -150,60 +153,32 @@ def array(x, y):
     #print(np.array(data_x).shape)
 
 # Выделение по цвету
-def color():
-    cv2.namedWindow( "result" )
+def color(img, hsv_min, hsv_max):
 
-    # Границы для выбранного ранее цвета
-    minb = color_range.MINB
-    ming = color_range.MING
-    minr = color_range.MINR
-    maxb = color_range.MAXB
-    maxg = color_range.MAXG
-    maxr = color_range.MAXR
-    hsv_min = np.array((minb, ming, minr), np.uint8)
-    hsv_max = np.array((maxb, maxg, maxr), np.uint8)
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    thresh = cv2.inRange(hsv, hsv_min, hsv_max)
 
-    # Цвет для текста центра
-    color_yellow = (0,255,255)
+    # Момент изображения — это суммарная характеристика пятна, представляющая собой сумму всех точек (пикселей) этого пятна.
+    moments = cv2.moments(thresh, 1)
+    # Момент первого порядка m10 представляет собой сумму Y координат точек
+    dM01 = moments['m01']
+    # Момент первого порядка m10 представляет собой сумму X координат точек
+    dM10 = moments['m10']
+    # Момент нулевого порядка m00 — это количество всех точек, составляющих пятно
+    dArea = moments['m00']
 
-    while(cap.isOpened()):
-        _, frame = cap.read()
-        #img = cv2.flip(frame,1) # отражение кадра вдоль оси Y
-        img = np.copy(frame)
-        ball(img)
-        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        thresh = cv2.inRange(hsv, hsv_min, hsv_max)
+    # Если количество пикселей пятна > 100
+    if dArea > 100:
+        # Средние координаты X и Y - центр пятна
+        x = int(dM10 / dArea)
+        y = int(dM01 / dArea)
+        cv2.circle(img, (x, y), 5, (0,255,255), 2)
+        cv2.putText(img, "%d-%d" % (x,y), (x+10,y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2)
 
-        # Момент изображения — это суммарная характеристика пятна, представляющая собой сумму всех точек (пикселей) этого пятна.
-        moments = cv2.moments(thresh, 1)
-        # Момент первого порядка m10 представляет собой сумму Y координат точек
-        dM01 = moments['m01']
-        # Момент первого порядка m10 представляет собой сумму X координат точек
-        dM10 = moments['m10']
-        # Момент нулевого порядка m00 — это количество всех точек, составляющих пятно
-        dArea = moments['m00']
+        # наполняем массивы значениеями координат центра окружности
+        #array(x, y)
 
-        # Если количество пикселей пятна > 100
-        if dArea > 100:
-            # Средние координаты X и Y - центр пятна
-            x = int(dM10 / dArea)
-            y = int(dM01 / dArea)
-            cv2.circle(img, (x, y), 5, color_yellow, 2)
-            cv2.putText(img, "%d-%d" % (x,y), (x+10,y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, color_yellow, 2)
-
-            # наполняем массивы значениеями координат центра окружности
-            array(x, y)
-
-        cv2.imshow('result', img)
-        cv2.imshow('thresh ', thresh)
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
-
-    return (np.array(data_x))
+    return (thresh)
 
 if __name__ == '__main__':
 
@@ -224,9 +199,39 @@ if __name__ == '__main__':
     if args["ball"] is not None:
         cap = cv2.VideoCapture(args["ball"])
 
+        #cv2.namedWindow( "result" )
+
         # массив для записи координат центра
         # для линейной регрессии
         data_x = []
         data_y = []
 
-        color()
+        # Границы для выбранного ранее цвета
+        minb = color_range.MINB
+        ming = color_range.MING
+        minr = color_range.MINR
+        maxb = color_range.MAXB
+        maxg = color_range.MAXG
+        maxr = color_range.MAXR
+        hsv_min = np.array((minb, ming, minr), np.uint8)
+        hsv_max = np.array((maxb, maxg, maxr), np.uint8)
+
+        while(cap.isOpened()):
+            _, frame = cap.read()
+            #img = cv2.flip(frame,1) # отражение кадра вдоль оси Y
+            img = np.copy(frame)
+
+            thresh = color(img, hsv_min, hsv_max)
+
+            image_circle = ball(thresh, img)
+
+            cv2.imshow('image ', image_circle)
+
+            #cv2.imshow('result', img)
+            cv2.imshow('thresh ', thresh)
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+        cap.release()
+        cv2.destroyAllWindows()
