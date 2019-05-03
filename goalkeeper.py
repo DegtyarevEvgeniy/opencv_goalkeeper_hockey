@@ -119,7 +119,8 @@ def ball(image, img):
     gray = cv2.Canny(output, 40, 10)
     # посик круга
     circles = cv2.HoughCircles(output, cv2.HOUGH_GRADIENT, 2.5, 57)
-
+    #circles = cv2.HoughCircles(output,cv2.HOUGH_GRADIENT,1,20,param1=20,param2=20,minRadius=30,maxRadius=400)
+    #print(circles)
     # если найдены круги
     if circles is not None:
     	# преобразование координаты (x, y) и радиуса окружностей в целые числа
