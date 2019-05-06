@@ -116,9 +116,11 @@ def predict(X):
 def ball(image, img):
     output = image.copy()
     #gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    gray = cv2.Canny(output, 40, 10)
+    blur = cv2.GaussianBlur(output, (5, 5), 0)
+    blur = cv2.GaussianBlur(blur, (5, 5), 0)
+    canny = cv2.Canny(blur, 40, 10)
     # посик круга
-    circles = cv2.HoughCircles(output, cv2.HOUGH_GRADIENT, 2.5, 57)
+    circles = cv2.HoughCircles(canny, cv2.HOUGH_GRADIENT, 2.5, 57)
     #circles = cv2.HoughCircles(output,cv2.HOUGH_GRADIENT,1,20,param1=20,param2=20,minRadius=30,maxRadius=400)
     #print(circles)
     # если найдены круги
@@ -129,7 +131,8 @@ def ball(image, img):
     	# Обвести найденый круг окружностью и нарисовать квадрат в центре круга
     	for (x, y, r) in circles:
     		cv2.circle(img, (x, y), r, (0, 0, 255), 4)
-    		#cv2.rectangle(img, (x - 5, y - 5), (x + 5, y + 5), (0, 255, 255), -1)
+    		cv2.rectangle(img, (x - 5, y - 5), (x + 5, y + 5), (0, 255, 255), -1)
+    #cv2.putText(img, "%d-%d" % (x,y), (x+10,y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2)
 
     	#cv2.imshow("output", np.hstack([image, output]))
 
@@ -158,7 +161,7 @@ def color(img, hsv_min, hsv_max):
 
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     thresh = cv2.inRange(hsv, hsv_min, hsv_max)
-
+    '''
     # Момент изображения — это суммарная характеристика пятна, представляющая собой сумму всех точек (пикселей) этого пятна.
     moments = cv2.moments(thresh, 1)
     # Момент первого порядка m10 представляет собой сумму Y координат точек
@@ -178,7 +181,7 @@ def color(img, hsv_min, hsv_max):
 
         # наполняем массивы значениеями координат центра окружности
         #array(x, y)
-
+    '''
     return (thresh)
 
 if __name__ == '__main__':
