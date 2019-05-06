@@ -32,7 +32,8 @@ def range(camera):
 
     while(cap.isOpened()):
         _, frame = cap.read()
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        img = cv2.imread("1.jpg")
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         cv2.imshow('hsv', hsv)
 
         minb = cv2.getTrackbarPos('minb', 'result')
@@ -45,7 +46,7 @@ def range(camera):
 
         mask = cv2.inRange(hsv, (minb, ming, minr), (maxb, maxg, maxr))
         cv2.imshow('mask', mask)
-        result = cv2.bitwise_and(frame, frame, mask = mask)
+        result = cv2.bitwise_and(img, img, mask = mask)
         cv2.imshow('result', result)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -120,7 +121,7 @@ def ball(image, img):
     blur = cv2.GaussianBlur(blur, (5, 5), 0)
     canny = cv2.Canny(blur, 40, 10)
     # посик круга
-    circles = cv2.HoughCircles(canny, cv2.HOUGH_GRADIENT, 2.5, 57)
+    circles = cv2.HoughCircles(canny, cv2.HOUGH_GRADIENT, 2, 85)
     #circles = cv2.HoughCircles(output,cv2.HOUGH_GRADIENT,1,20,param1=20,param2=20,minRadius=30,maxRadius=400)
     #print(circles)
     # если найдены круги
@@ -223,7 +224,8 @@ if __name__ == '__main__':
         while(cap.isOpened()):
             _, frame = cap.read()
             #img = cv2.flip(frame,1) # отражение кадра вдоль оси Y
-            img = np.copy(frame)
+            #img = np.copy(frame)
+            img = cv2.imread("1.jpg")
 
             thresh = color(img, hsv_min, hsv_max)
 
