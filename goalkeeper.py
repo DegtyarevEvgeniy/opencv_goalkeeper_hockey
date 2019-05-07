@@ -131,12 +131,11 @@ def ball(image, img):
 
     	# Обвести найденый круг окружностью и нарисовать квадрат в центре круга
     	for (x, y, r) in circles:
-    		cv2.circle(img, (x, y), r, (0, 0, 255), 4)
-    		cv2.rectangle(img, (x - 5, y - 5), (x + 5, y + 5), (0, 255, 255), -1)
-    #cv2.putText(img, "%d-%d" % (x,y), (x+10,y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2)
+            cv2.circle(img, (x, y), r, (0, 0, 255), 4)
+            cv2.rectangle(img, (x - 5, y - 5), (x + 5, y + 5), (0, 255, 255), -1)
+            cv2.putText(img, "%d-%d" % (x, y), (x+10, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
     	#cv2.imshow("output", np.hstack([image, output]))
-
     return(img)
 
 # массивы для линейной регрессии
