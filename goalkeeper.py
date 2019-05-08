@@ -57,7 +57,8 @@ def range(camera):
                         "MINR = " + str(minr) + "\n"
                         "MAXB = " + str(maxb) + "\n"
                         "MAXG = " + str(maxg) + "\n"
-                        "MAXR = " + str(maxr))
+                        "MAXR = " + str(maxr) + "\n"
+                        "Y = " + str(frame.shape[0]))
             handle.close()
             break
 
@@ -66,31 +67,32 @@ def range(camera):
 
 # Линейная регрессия
 def predict():
+    print('Предсказание')
     # прямая линия от (0,0) до (10,10)
     # преобразование x в двумерный массив, т.е. 1 колонка и необходимое количество рядов
-    #x = np.array([1, 2, 4, 5, 6, 8, 10])
+    #x = np.array([1, 2, 4, 5, 6, 8, 10]).reshape((-1, 1))
     #y = np.array([1, 2, 4, 5, 6, 8, 10])
     # добавление еще по одному элементу
     #x=np.append(x,15).reshape((-1, 1))
     #y=np.append(y,15)
 
     # наполняем массивы данными из файла
-    x = np.array(data_predict.X).reshape((-1, 1))
-    y = np.array(data_predict.Y)
+    x = np.array(data_predict.X)
+    y = np.array(data_predict.Y).reshape((-1, 1))
 
     # построить график
-    #plt.plot(x, y)
-    #plt.show()
+    plt.plot(x, y)
+    plt.show()
 
     print(x)
     print(y)
 
     # создание модели с параметрами по умолчанию
     # .fit() - вычисляются оптимальные значение весов 𝑏₀ и 𝑏₁
-    model = LinearRegression().fit(x,y)
+    model = LinearRegression().fit(y,x)
 
     # .score() принимает в качестве аргументов предсказатель x и регрессор y, и возвращает значение 𝑅².
-    r_sq = model.score(x,y)
+    r_sq = model.score(y,x)
     print('coefficient of determination:', r_sq)
 
     # model содержит атрибуты .intercept_, который представляет собой коэффициент, и 𝑏₀ с .coef_, которые представляют 𝑏₁:
@@ -109,12 +111,14 @@ def predict():
     # предсказание для x = 23
     #x0 = np.array([23]).reshape((-1, 1))
     #x0 = np.array([X]).reshape((-1, 1))
-    y0 = np.array([480])
+    #y0 = np.array([480])
+    #y0 = np.array([Y]).reshape((-1, 1))
+    y0 = np.array([color_range.Y]).reshape((-1, 1))
     #y_pred = model.predict(x0)
     #print('При X =', int(x0))
     x_pred = model.predict(y0)
-    print('При Y = %d', int(y0))
-    print('Предсказание для X = %d', int(x_pred))
+    print('При Y = ', int(y0))
+    print('Предсказание для X = ', int(x_pred))
 
 # Поиск мяча
 def ball(image, img):
@@ -138,6 +142,7 @@ def ball(image, img):
                 cv2.circle(img, (x, y), r, (0, 0, 255), 4)
                 cv2.rectangle(img, (x - 5, y - 5), (x + 5, y + 5), (0, 255, 255), -1)
                 cv2.putText(img, "%d-%d" % (x, y), (x+10, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                print('X - ', x, ' Y - ', y)
                 #наполняем массивы данными координат
                 array(x, y)
     	#cv2.imshow("output", np.hstack([image, output]))
@@ -159,7 +164,7 @@ def array(x, y):
         handle.write("X = " + str(data_x) + "\n"
                     "Y = " + str(data_y))
         handle.close
-        #predict()
+        predict()
     #print(np.array(data_x).shape)
 
 # Выделение по цвету
