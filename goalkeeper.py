@@ -32,8 +32,8 @@ def range(camera):
 
     while(cap.isOpened()):
         _, frame = cap.read()
-        img = cv2.imread("1.jpg")
-        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        #img = cv2.imread("1.jpg")
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         cv2.imshow('hsv', hsv)
 
         minb = cv2.getTrackbarPos('minb', 'result')
@@ -46,7 +46,7 @@ def range(camera):
 
         mask = cv2.inRange(hsv, (minb, ming, minr), (maxb, maxg, maxr))
         cv2.imshow('mask', mask)
-        result = cv2.bitwise_and(img, img, mask = mask)
+        result = cv2.bitwise_and(frame, frame, mask = mask)
         cv2.imshow('result', result)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -65,7 +65,7 @@ def range(camera):
     cv2.destroyAllWindows()
 
 # Линейная регрессия
-def predict(X):
+def predict():
     # прямая линия от (0,0) до (10,10)
     # преобразование x в двумерный массив, т.е. 1 колонка и необходимое количество рядов
     #x = np.array([1, 2, 4, 5, 6, 8, 10])
@@ -79,8 +79,8 @@ def predict(X):
     y = np.array(data_predict.Y)
 
     # построить график
-    plt.plot(x, y)
-    plt.show()
+    #plt.plot(x, y)
+    #plt.show()
 
     print(x)
     print(y)
@@ -108,10 +108,13 @@ def predict(X):
 
     # предсказание для x = 23
     #x0 = np.array([23]).reshape((-1, 1))
-    x0 = np.array([X]).reshape((-1, 1))
-    y_pred = model.predict(x0)
-    print('При X =', int(x0))
-    print('Предсказание для Y =', int(y_pred))
+    #x0 = np.array([X]).reshape((-1, 1))
+    y0 = np.array([480])
+    #y_pred = model.predict(x0)
+    #print('При X =', int(x0))
+    x_pred = model.predict(y0)
+    print('При Y = %d', int(y0))
+    print('Предсказание для X = %d', int(x_pred))
 
 # Поиск мяча
 def ball(image, img):
@@ -131,10 +134,12 @@ def ball(image, img):
 
     	# Обвести найденый круг окружностью и нарисовать квадрат в центре круга
     	for (x, y, r) in circles:
-            cv2.circle(img, (x, y), r, (0, 0, 255), 4)
-            cv2.rectangle(img, (x - 5, y - 5), (x + 5, y + 5), (0, 255, 255), -1)
-            cv2.putText(img, "%d-%d" % (x, y), (x+10, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
+            if x != 0 and y != 0:
+                cv2.circle(img, (x, y), r, (0, 0, 255), 4)
+                cv2.rectangle(img, (x - 5, y - 5), (x + 5, y + 5), (0, 255, 255), -1)
+                cv2.putText(img, "%d-%d" % (x, y), (x+10, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                #наполняем массивы данными координат
+                array(x, y)
     	#cv2.imshow("output", np.hstack([image, output]))
     return(img)
 
@@ -148,12 +153,13 @@ def array(x, y):
 
     # количество записей/замеров
     # если np.array(data_x).shape = 20 то выполнить предсказание
-    print(np.array(data_x).shape[0])
+    #print(np.array(data_x).shape[0])
     if np.array(data_x).shape[0] == 20 or np.array(data_y).shape[0] == 20:
-            handle = open("data_predict.py", "w")
-            handle.write("X = " + str(data_x) + "\n"
-                        "Y = " + str(data_y))
-            handle.close
+        handle = open("data_predict.py", "w")
+        handle.write("X = " + str(data_x) + "\n"
+                    "Y = " + str(data_y))
+        handle.close
+        #predict()
     #print(np.array(data_x).shape)
 
 # Выделение по цвету
@@ -223,8 +229,8 @@ if __name__ == '__main__':
         while(cap.isOpened()):
             _, frame = cap.read()
             #img = cv2.flip(frame,1) # отражение кадра вдоль оси Y
-            #img = np.copy(frame)
-            img = cv2.imread("1.jpg")
+            img = np.copy(frame)
+            #img = cv2.imread("1.jpg")
 
             thresh = color(img, hsv_min, hsv_max)
 
