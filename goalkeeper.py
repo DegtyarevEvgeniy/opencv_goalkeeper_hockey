@@ -66,7 +66,7 @@ def range(camera):
     cv2.destroyAllWindows()
 
 # Линейная регрессия
-def predict():
+def predict(img):
     print('Предсказание')
     # прямая линия от (0,0) до (10,10)
     # преобразование x в двумерный массив, т.е. 1 колонка и необходимое количество рядов
@@ -81,11 +81,11 @@ def predict():
     y = np.array(data_predict.Y).reshape((-1, 1))
 
     # построить график
-    plt.plot(x, y)
-    ax = plt.gca()
-    ax.set_xlim([0, 640])
-    ax.set_ylim([0, 480])
-    plt.show()
+    #plt.plot(x, y)
+    #ax = plt.gca()
+    #ax.set_xlim([0, 640])
+    #ax.set_ylim([0, 480])
+    #lt.show()
 
     print(x)
     print(y)
@@ -123,6 +123,9 @@ def predict():
     print('При Y = ', int(y0))
     print('Предсказание для X = ', int(x_pred))
 
+    cv2.circle(img, (int(x_pred), color_range.Y), 10, (0, 255, 255), 7)
+    cv2.imshow('Predict', img)
+
     return(int(x_pred))
 
 # Поиск мяча
@@ -149,12 +152,12 @@ def ball(image, img):
                 cv2.putText(img, "%d-%d" % (x, y), (x+10, y-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                 print('X - ', x, ' Y - ', y)
                 #наполняем массивы данными координат
-                array(x, y)
+                array(x, y, img)
     	#cv2.imshow("output", np.hstack([image, output]))
     return(img)
 
 # массивы для линейной регрессии
-def array(x, y):
+def array(x, y, img):
     # наполняем координатами центра
     data_x.append(x)
     data_y.append(y)
@@ -169,7 +172,7 @@ def array(x, y):
         handle.write("X = " + str(data_x) + "\n"
                     "Y = " + str(data_y))
         handle.close
-        predict()
+        predict(img)
     #print(np.array(data_x).shape)
 
 # Выделение по цвету
