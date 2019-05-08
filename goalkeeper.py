@@ -82,6 +82,9 @@ def predict():
 
     # построить график
     plt.plot(x, y)
+    ax = plt.gca()
+    ax.set_xlim([0, 640])
+    ax.set_ylim([0, 480])
     plt.show()
 
     print(x)
@@ -119,6 +122,8 @@ def predict():
     x_pred = model.predict(y0)
     print('При Y = ', int(y0))
     print('Предсказание для X = ', int(x_pred))
+
+    return(int(x_pred))
 
 # Поиск мяча
 def ball(image, img):
